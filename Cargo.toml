@@ -1,10 +1,15 @@
 [package]
-name = "rigol-rs"
+name = "rigolrs"
 version = "0.1.0"
 authors = ["Aleh Zasypkin <aleh.zasypkin@gmail.com>"]
 
 [dependencies]
 docopt = "0.6.81"
 docopt_macros = "0.6.84"
-rotor = "0.6.3"
+encoding = "0.2.32"
+iron = "0.3.0"
+log = "0.3.6"
+mount = "0.1.0"
+router = "0.1.1"
 rustc-serialize = "0.3.19"
+staticfile = "0.2.0"
