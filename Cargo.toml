@@ -1,0 +1,10 @@
+[package]
+name = "rigol-rs"
+version = "0.1.0"
+authors = ["Aleh Zasypkin <aleh.zasypkin@gmail.com>"]
+
+[dependencies]
+docopt = "0.6.81"
+docopt_macros = "0.6.84"
+rotor = "0.6.3"
+rustc-serialize = "0.3.19"
