@@ -64,16 +64,25 @@ fn perform_command<A: ToSocketAddrs>(address: A) {
     println!("Response: {}", response);
 }
 
-fn read_image<A: ToSocketAddrs>(address: A) -> [u8; 1000000] {
+fn read_image<A: ToSocketAddrs>(address: A) -> Vec<u8> {
     // let mut command_bytes = ASCII.encode(":CURSor:MANual:YDELta?", EncoderTrap::Strict).unwrap();
     let mut command_bytes = ASCII.encode(":DISP:DATA?", EncoderTrap::Strict).unwrap();
     command_bytes.push('\r' as u8);
     let mut stream = TcpStream::connect(address).unwrap();
     stream.write_all(&command_bytes).unwrap();
 
-    // let mut buffer = [0; 1152054];
-    let mut buffer = [0; 1000000];
-    stream.read_exact(&mut buffer).unwrap();
+    let mut buffer1 = [0; 576032];
+    stream.read_exact(&mut buffer1).unwrap();
+    println!("{:?}", buffer1.len());
+
+    let mut buffer2 = [0; 576036];
+    stream.read_exact(&mut buffer2).unwrap();
+    println!("{:?}", buffer2.len());
+
+    println!("{:?}", buffer2.len());
+
+    let mut buffer: Vec<u8> = buffer1[0..].to_vec();
+    buffer.extend_from_slice(&buffer2);
 
     println!("{:?}", buffer.len());
 
