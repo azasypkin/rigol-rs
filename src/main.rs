@@ -4,6 +4,8 @@
 
 extern crate docopt;
 extern crate encoding;
+#[macro_use]
+extern crate hyper;
 extern crate iron;
 #[macro_use]
 extern crate log;
@@ -15,8 +17,11 @@ extern crate staticfile;
 use encoding::{ Encoding, EncoderTrap };
 use encoding::all::ASCII;
 
+use hyper::mime::{Mime, TopLevel, SubLevel};
+
 use iron::prelude::*;
 use iron::{ Handler };
+use iron::headers::ContentType;
 use iron::status::Status;
 
 use std::io::prelude::*;
@@ -52,19 +57,29 @@ fn perform_command<A: ToSocketAddrs>(address: A) {
     let mut stream = TcpStream::connect(address).unwrap();
     stream.write_all(&command_bytes).unwrap();
 
-    //    let mut response = String::new();
-    //    let mut limited = stream.take(7);
-    //    limited.read_to_string(&mut response).unwrap();
-    //    println!("{:?}", response.as_bytes());
-
-
-
     let mut reader = BufReader::new(stream);
 
     let mut response = String::new();
     reader.read_line(&mut response).unwrap();
     println!("Response: {}", response);
 }
+
+fn read_image<A: ToSocketAddrs>(address: A) -> [u8; 1000000] {
+    // let mut command_bytes = ASCII.encode(":CURSor:MANual:YDELta?", EncoderTrap::Strict).unwrap();
+    let mut command_bytes = ASCII.encode(":DISP:DATA?", EncoderTrap::Strict).unwrap();
+    command_bytes.push('\r' as u8);
+    let mut stream = TcpStream::connect(address).unwrap();
+    stream.write_all(&command_bytes).unwrap();
+
+    // let mut buffer = [0; 1152054];
+    let mut buffer = [0; 1000000];
+    stream.read_exact(&mut buffer).unwrap();
+
+    println!("{:?}", buffer.len());
+
+    buffer
+}
+
 struct Run {
     address: String,
     port: u16,
@@ -72,8 +87,15 @@ struct Run {
 
 impl Handler for Run {
     fn handle (&self, _: &mut Request) -> IronResult<Response> {
-        perform_command((self.address.as_ref(), self.port));
-        Ok(Response::with(Status::NoContent))
+        //perform_command((self.address.as_ref(), self.port));
+        let buffer = read_image((self.address.as_ref(), self.port));
+        //println!("Len {}", buffer.len());
+        let data: Vec<u8> = buffer[11..].to_vec();
+
+        let mut response = Response::with(data);
+        response.status = Some(Status::Ok);
+        response.headers.set(ContentType(Mime(TopLevel::Image, SubLevel::Bmp, vec![])));
+        Ok(response)
     }
 }
 

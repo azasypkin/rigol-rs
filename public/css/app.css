@@ -1,0 +1,7 @@
+#screenshot-img {
+    width: 800px;
+    height: 480px;
+    display: block;
+    margin: 1rem;
+    background-color: green;
+}

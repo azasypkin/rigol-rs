@@ -7,6 +7,7 @@ authors = ["Aleh Zasypkin <aleh.zasypkin@gmail.com>"]
 docopt = "0.6.81"
 docopt_macros = "0.6.84"
 encoding = "0.2.32"
+hyper = "0.8.1"
 iron = "0.3.0"
 log = "0.3.6"
 mount = "0.1.0"
