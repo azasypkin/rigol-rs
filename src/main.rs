@@ -98,7 +98,21 @@ impl Handler for Run {
     fn handle (&self, _: &mut Request) -> IronResult<Response> {
         //perform_command((self.address.as_ref(), self.port));
         let buffer = read_image((self.address.as_ref(), self.port));
-        //println!("Len {}", buffer.len());
+        let data: Vec<u8> = buffer[11..].to_vec();
+
+        let mut response = Response::with(data);
+        response.status = Some(Status::Ok);
+        response.headers.set(ContentType(Mime(TopLevel::Image, SubLevel::Bmp, vec![])));
+        Ok(response)
+    }
+}
+
+struct Test;
+
+impl Handler for Test {
+    fn handle (&self, _: &mut Request) -> IronResult<Response> {
+        //perform_command((self.address.as_ref(), self.port));
+        let buffer = read_image((self.address.as_ref(), self.port));
         let data: Vec<u8> = buffer[11..].to_vec();
 
         let mut response = Response::with(data);
@@ -120,6 +134,7 @@ fn main() {
         address: args.flag_address,
         port: args.flag_port,
     });
+    mount.test("/test", Test);
 
     println!("Server running on http://localhost:3000/");
 
